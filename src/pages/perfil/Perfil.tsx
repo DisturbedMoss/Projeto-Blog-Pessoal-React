@@ -26,7 +26,7 @@ function Perfil() {
 
         <img
           className="rounded-full w-56 mx-auto -mt-32 border-8 border-white relative z-10"
-          src={usuario.foto}
+          src={usuario.foto || 'https://ik.imagekit.io/Disturbedmoss/145856997_296fe121-5dfa-43f4-98b5-db50019738a7.svg?updatedAt=1761940984708'}
           alt={`Foto de perfil de ${usuario.nome}`}
         />
 
