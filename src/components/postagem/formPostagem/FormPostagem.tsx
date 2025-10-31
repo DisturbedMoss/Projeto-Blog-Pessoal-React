@@ -5,6 +5,7 @@ import { atualizar, buscar, cadastrar } from "../../../services/Service";
 import type Tema from "../../../models/Tema";
 import type Postagem from "../../../models/Postagem";
 import { ClipLoader } from "react-spinners";
+import { ToastAlerta } from "../../../utils/ToastAlerta";
 
 function FormPostagem() {
   const navigate = useNavigate();
@@ -16,8 +17,8 @@ function FormPostagem() {
 
   const [postagem, setPostagem] = useState<Postagem>({} as Postagem);
 
+  //Serve para verificar o token
   const { usuario, handleLogout } = useContext(AuthContext);
-
   const token = usuario.token;
 
   const { id } = useParams<{ id: string }>();
@@ -60,7 +61,7 @@ function FormPostagem() {
 
   useEffect(() => {
     if (token === "") {
-      alert("Você precisa estar logado!");
+      ToastAlerta("Você precisa estar logado!", 'info');
       navigate("/");
     }
   }, [token]);
@@ -116,12 +117,12 @@ function FormPostagem() {
             Authorization: token,
           },
         });
-        alert("Postagem atualizada com sucesso");
+        ToastAlerta("Postagem atualizada com sucesso", 'sucesso');
       } catch (error: any) {
         if (error.toString().includes("401")) {
           handleLogout();
         } else {
-          alert("Erro ao atualizar a postagem");
+          ToastAlerta("Erro ao atualizar a postagem", 'erro');
         }
       }
     } else {
@@ -131,12 +132,12 @@ function FormPostagem() {
             Authorization: token,
           },
         });
-        alert("Postagem cadastrada com sucesso");
+        ToastAlerta("Postagem cadastrada com sucesso", 'sucesso');
       } catch (error: any) {
         if (error.toString().includes("401")) {
           handleLogout();
         } else {
-          alert("Erro ao cadastrar a postagem");
+          ToastAlerta("Erro ao cadastrar a postagem", 'erro');
         }
       }
     }
@@ -185,6 +186,7 @@ function FormPostagem() {
             className="border p-2 border-slate-800 rounded"
             onChange={(e) => buscarTemaPorId(e.currentTarget.value)}
           >
+            {/* selected disabled -> 'Selecione um tema' vem selecionado mas não pode ser escolhida */}
             <option value="" selected disabled>
               Selecione um tema
             </option>
