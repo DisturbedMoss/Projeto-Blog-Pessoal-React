@@ -9,13 +9,42 @@ import { ClipLoader } from "react-spinners";
 function FormPostagem() {
   const navigate = useNavigate();
 
-  const [tema, setTema] = useState<Tema>({} as Tema);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+
+  const [temas, setTemas] = useState<Tema[]>([]);
+  const [tema, setTema] = useState<Tema>({ id: 0, descricao: "" });
+
+  const [postagem, setPostagem] = useState<Postagem>({} as Postagem);
+
   const { usuario, handleLogout } = useContext(AuthContext);
 
   const token = usuario.token;
 
   const { id } = useParams<{ id: string }>();
+
+  async function buscarPostagemPorId(id: string) {
+    try {
+      await buscar(`/postagens/${id}`, setPostagem, {
+        headers: { Authorization: token },
+      });
+    } catch (error: any) {
+      if (error.toString().includes("401")) {
+        handleLogout();
+      }
+    }
+  }
+
+  async function buscarTemaPorId(id: string) {
+    try {
+      await buscar(`/temas/${id}`, setTema, {
+        headers: { Authorization: token },
+      });
+    } catch (error: any) {
+      if (error.toString().includes("401")) {
+        handleLogout();
+      }
+    }
+  }
 
   async function buscarPorId(id: string) {
     try {
@@ -37,56 +66,85 @@ function FormPostagem() {
   }, [token]);
 
   useEffect(() => {
+    buscarTemas();
+
     if (id !== undefined) {
-      buscarPorId(id);
+      buscarPostagemPorId(id);
     }
   }, [id]);
 
+  useEffect(() => {
+    setPostagem({
+      ...postagem,
+      tema: tema,
+    });
+  }, [tema]);
+
   function atualizarEstado(e: ChangeEvent<HTMLInputElement>) {
-    setTema({
-      ...tema,
+    setPostagem({
+      ...postagem,
       [e.target.name]: e.target.value,
+      tema: tema,
+      usuario: usuario,
     });
   }
 
   function retornar() {
-    navigate("/temas");
+    navigate("/postagens");
   }
 
-  async function gerarNovoTema(e: FormEvent<HTMLFormElement>) {
+  async function buscarTemas() {
+    try {
+      await buscar("/temas", setTemas, {
+        headers: { Authorization: token },
+      });
+    } catch (error: any) {
+      if (error.toString().includes("401")) {
+        handleLogout();
+      }
+    }
+  }
+
+  async function gerarNovaPostagem(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setIsLoading(true);
 
     if (id !== undefined) {
       try {
-        await atualizar(`/temas`, tema, setTema, {
-          headers: { Authorization: token },
+        await atualizar(`/postagens`, postagem, setPostagem, {
+          headers: {
+            Authorization: token,
+          },
         });
-        alert("O tema foi atualizado com sucesso!");
+        alert("Postagem atualizada com sucesso");
       } catch (error: any) {
         if (error.toString().includes("401")) {
           handleLogout();
         } else {
-          alert("Erro ao atualizar o tema");
+          alert("Erro ao atualizar a postagem");
         }
       }
     } else {
       try {
-        await cadastrar(`/temas`, tema, setTema, {
-          headers: { Authorization: token },
+        await cadastrar(`/postagens`, postagem, setPostagem, {
+          headers: {
+            Authorization: token,
+          },
         });
-        alert("O tema foi cadastrado com sucesso!");
+        alert("Postagem cadastrada com sucesso");
       } catch (error: any) {
         if (error.toString().includes("401")) {
           handleLogout();
         } else {
-          alert("Erro ao cadastrar o tema");
+          alert("Erro ao cadastrar a postagem");
         }
       }
     }
     setIsLoading(false);
     retornar();
   }
+
+  const carregandoTema = tema.descricao === "";
 
   return (
     <div className="container flex flex-col mx-auto items-center">
