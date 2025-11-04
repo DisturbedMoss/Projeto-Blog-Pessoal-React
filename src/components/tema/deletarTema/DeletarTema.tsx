@@ -58,7 +58,7 @@ function DeletarTema() {
       if (error.toString().includes("401")) {
         handleLogout();
       } else {
-        ToastAlerta("Erro ao deletar tema");
+        ToastAlerta("Erro ao deletar tema", 'erro');
       }
     }
     setIsLoading(false);

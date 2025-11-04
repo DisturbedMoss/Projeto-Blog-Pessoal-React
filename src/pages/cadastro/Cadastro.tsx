@@ -37,7 +37,7 @@ const Cadastro = () => {
     });
   }
 
-  function handleConfirmarSenha(e: Change<HTMLInputElement>) {
+  function handleConfirmarSenha(e: ChangeEvent<HTMLInputElement>) {
     setConfirmSenha(e.target.value);
   }
 
